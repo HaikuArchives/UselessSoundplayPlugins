@@ -1,0 +1,23 @@
+;from top to bottom, up to 2+14 colors, in hex (same format as HTML, or as dropped by Colors!)
+; <- this is a comment
+; first color is border color
+#000000
+; second color is fill color
+#9E9E9E
+
+#FFFFFF
+#FFFFFF
+#000000
+#000000
+#FFFFFF
+#FFFFFF
+#000000
+#000000
+#FFFFFF
+#FFFFFF
+#000000
+#000000
+#FFFFFF
+#FFFFFF
+#000000
+#000000
