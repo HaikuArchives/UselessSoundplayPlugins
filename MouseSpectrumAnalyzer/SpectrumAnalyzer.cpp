@@ -142,12 +142,17 @@ void MouseSpectrumAnalyzerPlugin::TryLoadPalette(const char *name)
 		if (ent.InitCheck() == B_OK) {
 			if (ent.GetParent(&dir) == B_OK) {
 				BPath palpath;
-				ent.GetPath(&palpath);
-				if (ent.SetTo(&dir, PALETTES_FOLDER, true) == B_OK) {
+				while (ent.SetTo(&dir, PALETTES_FOLDER, true) == B_OK) {
 					if (dir.SetTo(&ent) == B_OK) {
-						
-					} else
+						ent.GetPath(&palpath);
+						fprintf(stderr, "palettes in '%s'.\n", palpath.Path());
+						break;
+					}
+					if (dir.IsRootDirectory()) {
 						dir.Unset();
+						break;
+					}
+					dir.SetTo(&dir, "..");
 				}
 			} else
 				dir.Unset();

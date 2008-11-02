@@ -289,7 +289,7 @@ void *getspectrumplugin(void **data,const char *, const char *, uint32, plugin_i
 		item = new BMenuItem("Quit Plugin", new BMessage('plop'));
 		menu->AddItem(item);
 		menu->AddItem(new BSeparatorItem);
-		item = new BMenuItem("Palette:", new BMessage('plop'));
+		item = new BMenuItem("Palette:", NULL);
 		item->SetEnabled(false);
 		menu->AddItem(item);
 		rgb_color *defPal = (rgb_color *)malloc(DEFAULT_PAL_CNT*sizeof(rgb_color));
