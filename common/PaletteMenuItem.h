@@ -10,6 +10,12 @@
 #include <GraphicsDefs.h>
 #include <MenuItem.h>
 
+#define DEFAULT_PAL_CNT 8
+extern const rgb_color kDefaultPalette[DEFAULT_PAL_CNT];
+
+/* name of the folder containing palettes */
+#define PALETTES_FOLDER "(MiniSpectrumPalettes)"
+
 /* returns the number of colors, or an error code */
 /* palette must be free()d by the caller when finished */
 extern int32 LoadPalette(const char *name, rgb_color **palette);
@@ -25,7 +31,7 @@ public:
 					uint32 modifiers = 0);
 virtual ~PaletteMenuItem();
 virtual void DrawContent();
-rgb_color *Palette(int *colors);
+const rgb_color *Palette(int *colors);
 	
 rgb_color *fPalette;
 int fColorCount;

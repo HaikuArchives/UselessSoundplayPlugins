@@ -13,8 +13,11 @@ endif
 export SPSDK
 
 SUBMAKEFILESPRE=
-SUBDIRS= MouseSpectrumAnalyzer glSpectrumAnalyzer.GL1 \
-MenuBarSpectrumAnalyzer TitleSpectrumAnalyzer 
+SUBDIRS= common \
+MouseSpectrumAnalyzer \
+glSpectrumAnalyzer.GL1 \
+MenuBarSpectrumAnalyzer \
+TitleSpectrumAnalyzer 
 #glSpectrumAnalyzer.GL2
 SUBMAKEFILESPOST=
 

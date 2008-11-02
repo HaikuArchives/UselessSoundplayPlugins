@@ -28,6 +28,18 @@
 
 #include "PaletteMenuItem.h"
 
+const rgb_color kDefaultPalette[DEFAULT_PAL_CNT] = {
+{0, 0, 0, 255},//{0x9e, 0x9e, 0x9e, 255}, /* border color */
+{0, 0, 0, 255},//{0x9e, 0x9e, 0x9e, 255}, /* fill color */
+{255, 0, 0, 255},
+{0, 0, 0, 255},//{0x9e, 0x9e, 0x9e, 255},
+{0, 185, 0, 255},
+{0, 225, 0, 255},
+{0, 245, 0, 255},
+{0, 255, 0, 255}
+};
+
+
 /* returns the number of colors, or an error code */
 /* palette must be free()d by the caller when finished */
 int32 LoadPalette(const char *name, rgb_color **palette)
@@ -112,7 +124,7 @@ void PaletteMenuItem::DrawContent()
 	BMenuItem::DrawContent();
 }
 
-rgb_color *PaletteMenuItem::Palette(int *colors)
+const rgb_color *PaletteMenuItem::Palette(int *colors)
 {
 	if (fPalette)
 		*colors = fColorCount;

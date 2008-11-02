@@ -6,7 +6,6 @@
 #define PLUGIN_NAME "MenuBar Spectrum Analyzer"
 #define PLUGIN_AUTHOR "François Revol"
 
-#define PALETTES_FOLDER "(MiniSpectrumPalettes)"
 /* 14 + border color + fill color */
 #define PAL_COLOR_COUNT 14
 #define GRAPH_WIDTH 32

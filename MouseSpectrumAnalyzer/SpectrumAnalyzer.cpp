@@ -73,20 +73,6 @@ plugin_descriptor **get_plugin_list(void) // this function gets exported
 }
 
 // ==============================================================================
-#define DEFAULT_PAL_CNT 8
-
-rgb_color kDefaultPalette[DEFAULT_PAL_CNT] = {
-{0, 0, 0, 255},//{0x9e, 0x9e, 0x9e, 255}, /* border color */
-{0, 0, 0, 255},//{0x9e, 0x9e, 0x9e, 255}, /* fill color */
-{255, 0, 0, 255},
-{0, 0, 0, 255},//{0x9e, 0x9e, 0x9e, 255},
-{0, 185, 0, 255},
-{0, 225, 0, 255},
-{0, 245, 0, 255},
-{0, 255, 0, 255}
-};
-
-// ==============================================================================
 
 class MouseSpectrumAnalyzerPlugin : public BView
 {
@@ -380,12 +366,17 @@ void PrefsView::AttachedToWindow()
 	if (ent.InitCheck() == B_OK) {
 		if (ent.GetParent(&dir) == B_OK) {
 			BPath palpath;
-			ent.GetPath(&palpath);
-			if (ent.SetTo(&dir, PALETTES_FOLDER, true) == B_OK) {
+			while (ent.SetTo(&dir, PALETTES_FOLDER, true) == B_OK) {
 				if (dir.SetTo(&ent) == B_OK) {
-					
-				} else
+					ent.GetPath(&palpath);
+					fprintf(stderr, "palettes in '%s'.\n", palpath.Path());
+					break;
+				}
+				if (dir.IsRootDirectory()) {
 					dir.Unset();
+					break;
+				}
+				dir.SetTo(&dir, "..");
 			}
 		} else
 			dir.Unset();
@@ -406,7 +397,7 @@ void PrefsView::AttachedToWindow()
 			BPath palpath;
 			if (ent.GetPath(&palpath) != B_OK)
 				continue;
-			//fprintf(stderr, PLUGIN_NAME": loading palette '%s'\n", palpath.Path());
+			fprintf(stderr, PLUGIN_NAME": loading palette '%s'\n", palpath.Path());
 			int32 count = LoadPalette(palpath.Path(), &pal);
 			if (count < 1)
 				continue;

@@ -75,20 +75,6 @@ plugin_descriptor **get_plugin_list(void) // this function gets exported
 }
 
 // ==============================================================================
-#define DEFAULT_PAL_CNT 8
-
-rgb_color kDefaultPalette[DEFAULT_PAL_CNT] = {
-{0, 0, 0, 255},//{0x9e, 0x9e, 0x9e, 255}, /* border color */
-{0, 0, 0, 255},//{0x9e, 0x9e, 0x9e, 255}, /* fill color */
-{255, 0, 0, 255},
-{0, 0, 0, 255},//{0x9e, 0x9e, 0x9e, 255},
-{0, 185, 0, 255},
-{0, 225, 0, 255},
-{0, 245, 0, 255},
-{0, 255, 0, 255}
-};
-
-// ==============================================================================
 
 class MenuBarSpectrumAnalyzerPlugin : public BMenuItem
 {
@@ -103,7 +89,7 @@ status_t	Render(const short *buffer, int32 count);
 	SoundPlayController *fController;
 	entry_ref fPluginRef;
 	BString fCurrentPalette;
-	rgb_color *fPalette;
+	const rgb_color *fPalette;
 	int fColors;
 	bool fKeepRunning;
 	bool fCheckSelection;
@@ -277,15 +263,21 @@ void *getspectrumplugin(void **data,const char *, const char *, uint32, plugin_i
 	BMenuItem *item;
 	BDirectory dir;
 	BEntry ent(info->ref);
+
 	if (ent.InitCheck() == B_OK) {
 		if (ent.GetParent(&dir) == B_OK) {
 			BPath palpath;
-			ent.GetPath(&palpath);
-			if (ent.SetTo(&dir, PALETTES_FOLDER, true) == B_OK) {
+			while (ent.SetTo(&dir, PALETTES_FOLDER, true) == B_OK) {
 				if (dir.SetTo(&ent) == B_OK) {
-					
-				} else
+					ent.GetPath(&palpath);
+					//fprintf(stderr, "palettes in '%s'.\n", palpath.Path());
+					break;
+				}
+				if (dir.IsRootDirectory()) {
 					dir.Unset();
+					break;
+				}
+				dir.SetTo(&dir, "..");
 			}
 		} else
 			dir.Unset();
