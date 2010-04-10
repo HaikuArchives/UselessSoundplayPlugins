@@ -262,30 +262,28 @@ void *getspectrumplugin(void **data,const char *, const char *, uint32, plugin_i
 	BMenu *menu = NULL;
 	BMenuItem *item;
 	BDirectory dir;
+	BDirectory palDir;
 	BEntry ent(info->ref);
 
 	if (ent.InitCheck() == B_OK) {
 		if (ent.GetParent(&dir) == B_OK) {
 			BPath palpath;
-			while (ent.SetTo(&dir, PALETTES_FOLDER, true) == B_OK) {
-				if (dir.SetTo(&ent) == B_OK) {
+			while (!dir.IsRootDirectory()) {
+				ent.SetTo(&dir, PALETTES_FOLDER, true);
+				if (palDir.SetTo(&ent) == B_OK) {
 					ent.GetPath(&palpath);
-					//fprintf(stderr, "palettes in '%s'.\n", palpath.Path());
+					fprintf(stderr, "palettes in '%s'.\n", palpath.Path());
 					break;
 				}
-				if (dir.IsRootDirectory()) {
-					dir.Unset();
+				if (dir.SetTo(&dir, "..") != B_OK)
 					break;
-				}
-				dir.SetTo(&dir, "..");
 			}
-		} else
-			dir.Unset();
+		}
 	}
 	menu = new BMenu("Palettes");
 	menu->SetRadioMode(true);
-	if (dir.InitCheck() == B_OK) {
-		dir.Rewind();
+	if (palDir.InitCheck() == B_OK) {
+		palDir.Rewind();
 		item = new BMenuItem("Quit Plugin", new BMessage('plop'));
 		menu->AddItem(item);
 		menu->AddItem(new BSeparatorItem);
@@ -298,7 +296,7 @@ void *getspectrumplugin(void **data,const char *, const char *, uint32, plugin_i
 			item = new PaletteMenuItem(defPal, DEFAULT_PAL_CNT, "Default", new BMessage(MSG_SETCOL));
 			menu->AddItem(item);
 		}
-		while (dir.GetNextEntry(&ent) == B_OK) {
+		while (palDir.GetNextEntry(&ent) == B_OK) {
 			rgb_color *pal = NULL;
 			BPath palpath;
 			if (ent.GetPath(&palpath) != B_OK)

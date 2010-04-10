@@ -136,34 +136,31 @@ void MouseSpectrumAnalyzerPlugin::TryLoadPalette(const char *name)
 		free(fPalette);
 	fPalette = NULL;
 	fColors = 0;
-	if (fname != "Default") {
-		BDirectory dir;
-		BEntry ent(&fPluginRef);
-		if (ent.InitCheck() == B_OK) {
-			if (ent.GetParent(&dir) == B_OK) {
-				BPath palpath;
-				while (ent.SetTo(&dir, PALETTES_FOLDER, true) == B_OK) {
-					if (dir.SetTo(&ent) == B_OK) {
-						ent.GetPath(&palpath);
-						fprintf(stderr, "palettes in '%s'.\n", palpath.Path());
-						break;
-					}
-					if (dir.IsRootDirectory()) {
-						dir.Unset();
-						break;
-					}
-					dir.SetTo(&dir, "..");
+	BEntry ent(&fPluginRef);
+	BDirectory dir;
+	BDirectory palDir;
+	if (fname != "Default" && ent.InitCheck() == B_OK) {
+		if (ent.GetParent(&dir) == B_OK) {
+			BPath palpath;
+			while (!dir.IsRootDirectory()) {
+				ent.SetTo(&dir, PALETTES_FOLDER, true);
+				if (palDir.SetTo(&ent) == B_OK) {
+					ent.GetPath(&palpath);
+					fprintf(stderr, "palettes in '%s'.\n", palpath.Path());
+					break;
 				}
-			} else
-				dir.Unset();
+				if (dir.SetTo(&dir, "..") != B_OK)
+					break;
+			}
 		}
-		if (dir.InitCheck() == B_OK) {
+
+		if (palDir.InitCheck() == B_OK) {
 			int cols;
-			BPath palpath(&dir, fname.String());
+			BPath palpath(&palDir, fname.String());
 			cols = LoadPalette(palpath.Path(), &fPalette);
 			if (cols < 1) {
 				fname << ".txt";
-				palpath.SetTo(&dir, fname.String());
+				palpath.SetTo(&palDir, fname.String());
 				cols = LoadPalette(palpath.Path(), &fPalette);
 			}
 			if (cols > 0)
@@ -367,29 +364,27 @@ void PrefsView::AttachedToWindow()
 	BMenu *menu;
 	BMenuItem *item;
 	BDirectory dir;
+	BDirectory palDir;
 	BEntry ent(&fPlugin->fPluginRef);
 	if (ent.InitCheck() == B_OK) {
 		if (ent.GetParent(&dir) == B_OK) {
 			BPath palpath;
-			while (ent.SetTo(&dir, PALETTES_FOLDER, true) == B_OK) {
-				if (dir.SetTo(&ent) == B_OK) {
+			while (!dir.IsRootDirectory()) {
+				ent.SetTo(&dir, PALETTES_FOLDER, true);
+				if (palDir.SetTo(&ent) == B_OK) {
 					ent.GetPath(&palpath);
 					fprintf(stderr, "palettes in '%s'.\n", palpath.Path());
 					break;
 				}
-				if (dir.IsRootDirectory()) {
-					dir.Unset();
+				if (dir.SetTo(&dir, "..") != B_OK)
 					break;
-				}
-				dir.SetTo(&dir, "..");
 			}
-		} else
-			dir.Unset();
+		}
 	}
 	menu = new BMenu("Palette");
 	menu->SetRadioMode(true);
-	if (dir.InitCheck() == B_OK) {
-		dir.Rewind();
+	if (palDir.InitCheck() == B_OK) {
+		palDir.Rewind();
 		rgb_color *defPal = (rgb_color *)malloc(DEFAULT_PAL_CNT*sizeof(rgb_color));
 		if (defPal) {
 			memcpy(defPal, kDefaultPalette, DEFAULT_PAL_CNT*sizeof(rgb_color));
@@ -397,7 +392,7 @@ void PrefsView::AttachedToWindow()
 			item = new PaletteMenuItem(defPal, DEFAULT_PAL_CNT, "Default", msg);
 			menu->AddItem(item);
 		}
-		while (dir.GetNextEntry(&ent) == B_OK) {
+		while (palDir.GetNextEntry(&ent) == B_OK) {
 			rgb_color *pal = NULL;
 			BPath palpath;
 			if (ent.GetPath(&palpath) != B_OK)
